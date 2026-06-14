@@ -1,0 +1,7 @@
+<svg width="420" height="96" viewBox="0 0 420 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="6" y="6" width="84" height="84" rx="24" fill="#0A0D12"/>
+  <path d="M56 14L24 52H45L39 82L72 41H51L56 14Z" fill="#58A6FF"/>
+  <path d="M56 14L24 52H45L39 82L72 41H51L56 14Z" stroke="white" stroke-opacity="0.85" stroke-width="3" stroke-linejoin="round"/>
+  <text x="110" y="61" font-family="Inter, Arial, sans-serif" font-size="44" font-weight="760" letter-spacing="-1.5" fill="#0A0D12">HyperSpeed</text>
+  <text x="112" y="82" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="4" fill="#64748B">T2A BUILDER</text>
+</svg>
