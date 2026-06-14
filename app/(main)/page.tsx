@@ -26,7 +26,48 @@ import { Context } from "./providers";
 import Header from "@/components/header";
 import { useS3Upload } from "next-s3-upload";
 import UploadIcon from "@/components/icons/upload-icon";
-import { MODELS, SUGGESTED_PROMPTS } from "@/lib/constants";
+import { MODELS } from "@/lib/constants";
+
+const HERO_PROMPT_CATEGORIES = {
+  Social: [
+    "Build a TikTok-style microlearning app with creator profiles, streaks, quizzes, and swipeable lessons.",
+    "Create a private friends app for plans, polls, memories, expense splits, and location-based meetups.",
+    "Make a creator media kit builder with rate cards, brand deals, analytics, and one-click share links.",
+    "Build a short-form community app for local events, reels, comments, creator pages, and moderation.",
+  ],
+  CRM: [
+    "Create a CRM for Instagram sellers to track DMs, leads, orders, payments, and follow-ups.",
+    "Build a freelancer client portal with proposals, invoices, milestones, files, and payment status.",
+    "Make a WhatsApp-first sales tracker with lead stages, reminders, notes, and daily follow-up lists.",
+    "Create a real estate CRM for listings, buyer profiles, site visits, documents, and deal pipelines.",
+  ],
+  Gaming: [
+    "Build a gaming squad finder with skill tags, profiles, voice-room links, match history, and rankings.",
+    "Create an esports tournament manager with teams, brackets, check-ins, scores, and prize tracking.",
+    "Make a daily challenge game with streaks, leaderboards, unlockable badges, and friend battles.",
+    "Build a gamer profile hub for clips, stats, squad invites, socials, and sponsor links.",
+  ],
+  Automation: [
+    "Create a smart home dashboard for lights, rooms, routines, energy usage, and alerts.",
+    "Build a family task automation app with chores, reminders, rewards, grocery lists, and shared notes.",
+    "Make a small-office control panel for visitors, devices, maintenance requests, and power usage.",
+    "Create an automation hub that triggers WhatsApp, email, calendar, and task flows from one dashboard.",
+  ],
+  Commerce: [
+    "Build a mini Shopify-style fashion store with products, carts, coupons, orders, and admin controls.",
+    "Create a cloud kitchen ordering app with QR menu, kitchen view, table status, offers, and feedback.",
+    "Make a hyperlocal services marketplace for tutors, drivers, repairs, bookings, and reviews.",
+    "Build a creator storefront for digital products, paid downloads, bundles, and customer access.",
+  ],
+  Study: [
+    "Create an AI study planner that turns exams into daily tasks, flashcards, and revision reminders.",
+    "Build a campus events app with clubs, RSVP, QR check-in, announcements, and group chats.",
+    "Make a job tracker for freshers with applications, rounds, notes, reminders, and resume versions.",
+    "Create a skill-learning app with roadmaps, projects, streaks, peer reviews, and certificates.",
+  ],
+} as const;
+
+type HeroPromptCategory = keyof typeof HERO_PROMPT_CATEGORIES;
 
 export default function Home() {
   const { setStreamPromise } = use(Context);
@@ -43,6 +84,8 @@ export default function Home() {
   const [screenshotLoading, setScreenshotLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [promptCategory, setPromptCategory] =
+    useState<HeroPromptCategory>("Social");
 
   const [isPending, startTransition] = useTransition();
 
@@ -66,6 +109,23 @@ export default function Home() {
     ],
     [],
   );
+
+  const activePromptIdeas = useMemo(
+    () => HERO_PROMPT_CATEGORIES[promptCategory],
+    [promptCategory],
+  );
+
+  const usePromptIdea = (description: string) => {
+    setPrompt(description);
+    setTimeout(() => {
+      textareaRef.current?.focus();
+      if (textareaRef.current) {
+        textareaRef.current.selectionStart = textareaRef.current.value.length;
+        textareaRef.current.selectionEnd = textareaRef.current.value.length;
+      }
+    }, 0);
+  };
+
   const handleScreenshotUpload = async (event: any) => {
     if (prompt.length === 0) setPrompt("Build this");
     setQuality("low");
@@ -112,10 +172,13 @@ export default function Home() {
               className="h-12 w-auto object-contain md:h-14"
             />
             <h1 className="text-balance text-center text-4xl leading-none text-gray-700 md:text-[64px] lg:mt-4">
-              Turn your <span className="text-blue-500">idea</span>
-              <br className="hidden md:block" /> into a live{" "}
-              <span className="text-blue-500">app</span>
+              What do you want to
+              <br className="hidden md:block" /> build today?
             </h1>
+            <HeroIdeaRotator
+              lines={activePromptIdeas}
+              onUsePrompt={usePromptIdea}
+            />
           </div>
 
           <form
@@ -406,28 +469,33 @@ export default function Home() {
                   />
                 )}
               </div>
-              <div className="mt-4 flex w-full flex-wrap justify-between gap-2.5">
-                {SUGGESTED_PROMPTS.map((v) => (
+              <div className="mt-4 flex w-full flex-wrap justify-center gap-2">
+                {(
+                  Object.keys(HERO_PROMPT_CATEGORIES) as HeroPromptCategory[]
+                ).map((category) => (
                   <button
-                    key={v.title}
+                    key={category}
                     type="button"
-                    onClick={() => {
-                      setPrompt(v.description);
-                      // Refocus the textarea after setting the prompt
-                      setTimeout(() => {
-                        textareaRef.current?.focus();
-                        // Position cursor at the end
-                        if (textareaRef.current) {
-                          textareaRef.current.selectionStart =
-                            textareaRef.current.value.length;
-                          textareaRef.current.selectionEnd =
-                            textareaRef.current.value.length;
-                        }
-                      }, 0);
-                    }}
-                    className="rounded bg-[#E5E9EF] px-2.5 py-1.5 text-xs tracking-[0%] transition-colors hover:bg-[#cccfd5]"
+                    onClick={() => setPromptCategory(category)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                      promptCategory === category
+                        ? "border-blue-200 bg-blue-50 text-blue-600"
+                        : "border-gray-200 bg-white/70 text-gray-500 hover:border-gray-300 hover:text-gray-800"
+                    }`}
                   >
-                    {v.title}
+                    {category}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-3 grid w-full gap-2 sm:grid-cols-2">
+                {activePromptIdeas.slice(0, 4).map((idea) => (
+                  <button
+                    key={idea}
+                    type="button"
+                    onClick={() => usePromptIdea(idea)}
+                    className="rounded-xl border border-gray-200 bg-white/70 px-3 py-2 text-left text-xs leading-relaxed text-gray-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-gray-800"
+                  >
+                    {idea}
                   </button>
                 ))}
               </div>
@@ -438,6 +506,59 @@ export default function Home() {
         <Footer />
       </div>
     </div>
+  );
+}
+
+function HeroIdeaRotator({
+  lines,
+  onUsePrompt,
+}: {
+  lines: readonly string[];
+  onUsePrompt: (prompt: string) => void;
+}) {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    setIndex(0);
+    setVisible(true);
+  }, [lines]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false);
+
+      setTimeout(() => {
+        setIndex((current) => (current + 1) % lines.length);
+        setVisible(true);
+      }, 420);
+    }, 3400);
+
+    return () => clearInterval(interval);
+  }, [lines.length]);
+
+  const currentLine = lines[index] ?? lines[0] ?? "";
+
+  return (
+    <button
+      type="button"
+      onClick={() => currentLine && onUsePrompt(currentLine)}
+      className="group min-h-[3.75rem] max-w-3xl text-balance px-3 text-center text-base leading-relaxed text-gray-500 md:text-xl"
+      aria-live="polite"
+    >
+      <span
+        className={`inline-block transition-all duration-500 ease-out ${
+          visible
+            ? "translate-y-0 opacity-100 blur-0"
+            : "translate-y-2 opacity-0 blur-sm"
+        }`}
+      >
+        {currentLine}
+      </span>
+      <span className="mt-1 block text-xs font-medium text-blue-500 opacity-0 transition group-hover:opacity-100">
+        Click to use this prompt
+      </span>
+    </button>
   );
 }
 
