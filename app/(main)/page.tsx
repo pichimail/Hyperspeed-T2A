@@ -9,7 +9,7 @@ import Spinner from "@/components/spinner";
 import bgImg from "@/public/halo.png";
 import * as Select from "@radix-ui/react-select";
 import assert from "assert";
-import { CheckIcon, ChevronDownIcon, RefreshCw } from "lucide-react";
+import { CheckIcon, ChevronDownIcon, Paperclip, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
@@ -24,7 +24,6 @@ import {
 
 import { Context } from "./providers";
 import { useS3Upload } from "next-s3-upload";
-import UploadIcon from "@/components/icons/upload-icon";
 import { MODELS } from "@/lib/constants";
 
 const PROMPT_IDEAS = {
@@ -175,7 +174,7 @@ export default function Home() {
       </div>
 
       <div className="isolate flex h-full grow flex-col">
-        <div className="flex grow flex-col items-center px-4 pb-6 pt-8 md:pt-12">
+        <div className="flex min-h-[calc(100vh-96px)] grow flex-col items-center justify-center px-4 pb-16 pt-6 md:pb-24 md:pt-8">
           <div className="flex flex-col items-center gap-4">
             <img
               src="/hyperspeed-logo.svg"
@@ -183,7 +182,7 @@ export default function Home() {
               className="h-11 w-auto object-contain md:h-12"
             />
 
-            <h1 className="max-w-4xl text-balance text-center text-4xl leading-[0.96] tracking-[-0.04em] text-gray-700 md:text-[64px]">
+            <h1 className="max-w-4xl text-balance text-center text-[38px] leading-[0.96] tracking-[-0.045em] text-gray-700 sm:text-5xl md:text-[64px]">
               What do you want to
               <br className="hidden md:block" /> build today?
             </h1>
@@ -352,11 +351,11 @@ export default function Home() {
                   <div className="flex items-center gap-2 sm:gap-3">
                     <label
                       htmlFor="screenshot"
-                      className="inline-flex size-8 cursor-pointer items-center justify-center rounded-md text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                      className="inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-gray-200 bg-gray-50 text-gray-600 transition hover:border-gray-300 hover:bg-white hover:text-gray-900"
                       aria-label="Attach screenshot"
                       title="Attach screenshot"
                     >
-                      <UploadIcon className="size-4" />
+                      <Paperclip className="size-4" strokeWidth={1.8} />
                     </label>
                     <input
                       id="screenshot"
@@ -475,14 +474,14 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+              <div className="mt-4 flex w-full max-w-2xl items-center gap-2 overflow-x-auto px-1 pb-2 [scrollbar-width:none] sm:justify-center sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
                 {(Object.keys(PROMPT_IDEAS) as PromptCategory[]).map(
                   (category) => (
                     <button
                       key={category}
                       type="button"
                       onClick={() => loadPromptFromCategory(category)}
-                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                      className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                         activeCategory === category
                           ? "border-blue-200 bg-blue-50 text-blue-600"
                           : "border-gray-200 bg-white/75 text-gray-500 hover:border-gray-300 hover:text-gray-700"
@@ -499,7 +498,7 @@ export default function Home() {
                   disabled={!activeCategory}
                   aria-label="Generate another prompt"
                   title="Generate another prompt"
-                  className="inline-flex size-8 items-center justify-center rounded-full border border-gray-200 bg-white/75 text-gray-500 transition hover:border-gray-300 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white/75 text-gray-500 transition hover:border-gray-300 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <RefreshCw className="size-3.5" />
                 </button>
@@ -516,11 +515,12 @@ export default function Home() {
 
 const Footer = memo(() => {
   return (
-    <footer className="flex w-full flex-col items-center justify-between gap-3 px-5 pb-5 pt-2 text-center text-sm text-gray-500 sm:flex-row">
+    <footer className="flex w-full items-center justify-center px-4 pb-3 pt-1 text-center text-[11px] text-gray-500 sm:justify-between sm:px-5 sm:pb-5 sm:text-sm">
       <div className="font-medium text-gray-600">
-        © {new Date().getFullYear()} HyperSpeed. Build, refine, share.
+        © {new Date().getFullYear()} HyperSpeed
+        <span className="max-sm:hidden">. Build, refine, share.</span>
       </div>
-      <div className="flex items-center gap-3 text-xs text-gray-500">
+      <div className="hidden items-center gap-3 text-xs text-gray-500 sm:flex">
         <span>React</span>
         <span className="h-1 w-1 rounded-full bg-gray-300" />
         <span>shadcn/ui</span>
